@@ -25,6 +25,7 @@ app.post('/chat/receive', async (req: Request, res: Response) => {
     const message = await getWhatsappMessage(messageSid);
     const completion = await getOpenAICompletion(message);
     await sendWhatsappMessage(message.from, completion);
+    console.log(completion)
     res.status(200).send({ success: true });
   } catch (error) {
     res.status(500).send({ error });
