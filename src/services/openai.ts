@@ -37,20 +37,18 @@ interface CreateChatCompletionResponse {
   choices: CreateChatCompletionResponseChoices[];
 }
 
-interface InputProps {
-    body: string,
-}
-
-export const getOpenAICompletion = async (input: InputProps): Promise<string> => {
+export const getOpenAICompletion = async (input: string): Promise<string> => {
   try {
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      messages: [{role: "user", content: input.body}],
+      messages: [{role: "user", content: input}],
       max_tokens: 2048,
       temperature: 0.5,
       n: 1,
       stop: ["\n"]
     });
+
+
 
     return completion.data.choices[0].message?.content as string
   } catch (error) {
