@@ -9,6 +9,7 @@ const authToken = process.env.TWILIO_AUTH_TOKEN as string;
 const client = twilio(accountSid, authToken);
 
 export const sendWhatsappMessage = async (to: string, body: string): Promise<void> => {
+  console.log("to", to)
   try {
     const message = await client.messages.create({
       to: `whatsapp:${to}`,
