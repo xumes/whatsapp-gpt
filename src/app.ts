@@ -13,7 +13,7 @@ app.use(cors());
 app.post('/chat/send', async (req: Request, res: Response) => {
   const { to, body } = req.body;
   try {
-    await sendWhatsappMessage(to, body);
+    await sendWhatsappMessage(`whatsapp:${to}`, body);
     console.log("sending", body)
     res.status(200).send({ success: true, body });
   } catch (error) {
@@ -23,17 +23,12 @@ app.post('/chat/send', async (req: Request, res: Response) => {
 
 app.post('/chat/receive', async (req: Request, res: Response) => {
   const twilioRequestBody = req.body;
-
   const messageBody = twilioRequestBody.Body;
-
-  console.log("messageBody", messageBody)
 
   try {
     const completion = await getOpenAICompletion(messageBody);
-    console.log("chat gpt disse: ", completion)
 
     await sendWhatsappMessage(twilioRequestBody.From, completion);
-    console.log("sending back", completion)
     res.status(200).send({ success: true });
   } catch (error) {
     res.status(500).send({ error });

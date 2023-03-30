@@ -48,8 +48,6 @@ export const getOpenAICompletion = async (input: string): Promise<string> => {
       stop: ["\n"]
     });
 
-
-
     return completion.data.choices[0].message?.content as string
   } catch (error) {
     console.error(`Error completing input: ${error}`);
