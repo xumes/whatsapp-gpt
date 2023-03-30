@@ -1,16 +1,38 @@
+import express, { Request, Response } from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import { sendWhatsappMessage, getWhatsappMessage } from './services/twilio';
 import { getOpenAICompletion } from './services/openai';
 
-// example usage
-const sendMessage = async (to: string, body: string): Promise<void> => {
-  await sendWhatsappMessage(to, body);
-};
+const app = express();
 
-const receiveMessage = async (messageSid: string): Promise<void> => {
-  const message = await getWhatsappMessage(messageSid);
-  const completion = await getOpenAICompletion(message);
-  await sendWhatsappMessage(message.from, completion);
-};
+app.use(bodyParser.json());
+app.use(cors());
 
-sendMessage('+19024710482', 'Hello, World!');
-receiveMessage('SMf6866e11f5ca3f785043811101f9a6cd');
+app.post('/chat/send', async (req: Request, res: Response) => {
+  const { to, body } = req.body;
+  try {
+    await sendWhatsappMessage(to, body);
+    res.status(200).send({ success: true, body });
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
+app.post('/chat/receive', async (req: Request, res: Response) => {
+  const { messageSid } = req.body;
+  try {
+    const message = await getWhatsappMessage(messageSid);
+    const completion = await getOpenAICompletion(message);
+    await sendWhatsappMessage(message.from, completion);
+    res.status(200).send({ success: true });
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
