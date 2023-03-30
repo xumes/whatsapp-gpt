@@ -22,9 +22,7 @@ app.post('/chat/send', async (req: Request, res: Response) => {
 });
 
 app.post('/chat/receive', async (req: Request, res: Response) => {
-  console.log("request", req)
   const twilioRequestBody = req.body;
-  console.log("twilioRequestBody", twilioRequestBody)
 
   const messageBody = twilioRequestBody.Body;
 
@@ -32,7 +30,9 @@ app.post('/chat/receive', async (req: Request, res: Response) => {
 
   try {
     const completion = await getOpenAICompletion(messageBody);
-    await sendWhatsappMessage(twilioRequestBody.from, completion);
+    console.log("chat gpt disse: ", completion)
+
+    await sendWhatsappMessage(twilioRequestBody.From, completion);
     console.log("sending back", completion)
     res.status(200).send({ success: true });
   } catch (error) {
