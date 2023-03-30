@@ -21,7 +21,10 @@ app.post('/chat/send', async (req: Request, res: Response) => {
 });
 
 app.post('/chat/receive', async (req: Request, res: Response) => {
+  console.log("request", req)
   const twilioRequestBody = req.body;
+  console.log("twilioRequestBody", twilioRequestBody)
+
   const messageBody = twilioRequestBody.Body;
 
   console.log("messageBody", messageBody)
