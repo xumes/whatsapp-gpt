@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { sendWhatsappMessage, getWhatsappMessage } from './services/twilio';
+import { sendWhatsappMessage } from './services/twilio';
 import { getOpenAICompletion } from './services/openai';
 
 const app = express();
@@ -21,12 +21,15 @@ app.post('/chat/send', async (req: Request, res: Response) => {
 });
 
 app.post('/chat/receive', async (req: Request, res: Response) => {
-  const { messageSid } = req.body;
+  const twilioRequestBody = req.body;
+  const messageBody = twilioRequestBody.Body;
+
+  console.log("messageBody", messageBody)
+
   try {
-    const message = await getWhatsappMessage(messageSid);
-    const completion = await getOpenAICompletion(message);
-    await sendWhatsappMessage(message.from, completion);
-    console.log("receiving", completion)
+    const completion = await getOpenAICompletion(messageBody);
+    await sendWhatsappMessage(twilioRequestBody.from, completion);
+    console.log("sending back", completion)
     res.status(200).send({ success: true });
   } catch (error) {
     res.status(500).send({ error });
